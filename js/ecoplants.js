@@ -13,14 +13,14 @@ const interesFijoSeisCuotas = 1.45;
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 // Elementos del DOM
-const productList = document.querySelector('#product-list');
-const cartList = document.querySelector('#cart-list');
-const totalPriceElement = document.querySelector('#total-price');
-const paymentPlanElement = document.querySelector('#payment-plan');
-const clearCartButton = document.querySelector('#clear-cart');
-const purchaseButton = document.querySelector('#purchase');
+const productList = document.querySelector('#lista-producto');
+const cartList = document.querySelector('#lista-carrito');
+const totalPriceElement = document.querySelector('#precio-total');
+const paymentPlanElement = document.querySelector('#plan-pagos');
+const clearCartButton = document.querySelector('#limpiar-carrito');
+const purchaseButton = document.querySelector('#comprar');
 const cuotasSelect = document.querySelector('#cuotas');
-const interestWarning = document.querySelector('#interest-warning');
+const interestWarning = document.querySelector('#interes-warn');
 
 // Función para buscar un producto por su código
 const buscarProducto = codigo => productos.find(producto => producto.codigo === codigo);

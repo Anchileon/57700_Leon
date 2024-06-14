@@ -72,11 +72,11 @@ nav ul li a {
     font-size: 2.5rem;
 }
 
-.featured-plants {
+.plantas-destacadas {
     padding: 40px 0;
 }
 
-#product-list {
+#lista-producto {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
@@ -152,11 +152,11 @@ button:hover, .btn:hover {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-#cart-list {
+#lista-carrito {
     margin-bottom: 20px;
 }
 
-#total-price, #payment-plan {
+#precio-total, #plan-pagos {
     margin-top: 20px;
     background: #fff;
     padding: 10px;
@@ -168,7 +168,7 @@ button:hover, .btn:hover {
     display: none;
 }
 
-#interest-warning {
+#interes-warn {
     color: red;
     font-weight: bold;
     margin-top: 10px;
