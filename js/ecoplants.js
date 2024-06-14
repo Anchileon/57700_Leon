@@ -9,92 +9,138 @@ const productos = [
 
 const interesFijoSeisCuotas = 1.45;
 
-let carrito = [];
+// Cargar carrito desde localStorage
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+// Elementos del DOM
+const productList = document.querySelector('#product-list');
+const cartList = document.querySelector('#cart-list');
+const totalPriceElement = document.querySelector('#total-price');
+const paymentPlanElement = document.querySelector('#payment-plan');
+const clearCartButton = document.querySelector('#clear-cart');
+const purchaseButton = document.querySelector('#purchase');
+const cuotasSelect = document.querySelector('#cuotas');
+const interestWarning = document.querySelector('#interest-warning');
 
 // Función para buscar un producto por su código
-const buscarProducto = (codigo) => productos.find(producto => producto.codigo === codigo);
+const buscarProducto = codigo => productos.find(producto => producto.codigo === codigo);
 
-// Función para mostrar productos
-function mostrarProductos() {
-    console.log("Productos disponibles:");
+// Función para mostrar productos en el DOM
+const mostrarProductos = () => {
+    productList.innerHTML = '';
     productos.forEach(producto => {
-        console.log(`${producto.codigo}: ${producto.nombre} - Precio: $${producto.precio}`);
+        const productCard = document.createElement('div');
+        productCard.className = 'plant-card';
+        productCard.innerHTML = `
+            <img src="./assets/img/${producto.nombre.toLowerCase().replace(' ', '')}.jpg" alt="${producto.nombre}">
+            <h3>${producto.nombre}</h3>
+            <p>Precio: $${producto.precio}</p>
+            <button onclick="agregarAlCarrito(${producto.codigo})">Agregar al carrito</button>
+        `;
+        productList.appendChild(productCard);
     });
 }
 
-// Función para agregar un producto al carrito
-function agregarAlCarrito(codigo) {
+// Función para agregar un producto al carrito y actualizar localStorage
+const agregarAlCarrito = codigo => {
     const producto = buscarProducto(codigo);
     if (producto) {
         carrito.push(producto);
-        console.log(`Producto ${producto.nombre} agregado al carrito.`);
-    } else {
-        console.error("Código de producto inválido.");
+        actualizarCarrito();
     }
 }
 
-// Función para mostrar el contenido del carrito
-function mostrarCarrito() {
+// Función para mostrar el contenido del carrito en el DOM
+const mostrarCarrito = () => {
+    cartList.innerHTML = '';
     if (carrito.length === 0) {
-        console.log("El carrito está vacío.");
+        cartList.innerHTML = '<p>El carrito está vacío.</p>';
         return;
     }
-    console.log("Carrito de compras:");
     carrito.forEach((producto, index) => {
-        console.log(`${index + 1}. ${producto.nombre} - Precio: $${producto.precio}`);
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <p>${producto.nombre} - Precio: $${producto.precio}</p>
+            <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+        `;
+        cartList.appendChild(cartItem);
     });
 }
 
-// Función para eliminar un producto
-function eliminarDelCarrito(indice) {
+// Función para eliminar un producto del carrito y actualizar localStorage
+const eliminarDelCarrito = indice => {
     if (indice >= 0 && indice < carrito.length) {
-        const productoEliminado = carrito.splice(indice, 1)[0];
-        console.log(`Producto ${productoEliminado.nombre} eliminado del carrito.`);
-    } else {
-        console.error("Índice de producto inválido.");
+        carrito.splice(indice, 1);
+        actualizarCarrito();
     }
 }
 
-// Función para calcular el precio total del carrito
-function calcularPrecioTotal(cuotas) {
-    const total = carrito.reduce((suma, producto) => suma + producto.precio, 0);
-    return cuotas === 6 ? total * interesFijoSeisCuotas : total;
+// Función para calcular el precio total del carrito sin cuotas
+const calcularPrecioTotalSinCuotas = () => carrito.reduce((suma, producto) => suma + producto.precio, 0);
+
+// Función para actualizar el total del carrito en tiempo real
+const actualizarTotalCarrito = () => {
+    const total = calcularPrecioTotalSinCuotas();
+    totalPriceElement.innerHTML = `Total: $${total.toFixed(2)}`;
 }
 
-// Función principal
-function simularCompra() {
-    let seguirComprando = true;
+// Función para actualizar el carrito en localStorage y en el DOM
+const actualizarCarrito = () => {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+    actualizarTotalCarrito(); // Actualiza el total cuando se modifica el carrito
+}
 
-    while (seguirComprando) {
+// Función para finalizar la compra
+const finalizarCompra = (total, cuotas) => {
+    const montoPorCuota = total / cuotas;
+    paymentPlanElement.innerHTML = `
+        <h3>¡Gracias por tu compra!</h3>
+        <p>Total a pagar: $${total.toFixed(2)}</p>
+        <h4>Desglose de pagos en ${cuotas} cuotas:</h4>
+        ${Array.from({ length: cuotas }, (_, i) => `<p>Cuota ${i + 1}: $${montoPorCuota.toFixed(2)}</p>`).join('')}
+        <button id="restart-purchase">Iniciar nueva compra</button>
+    `;
+
+    document.querySelector('#restart-purchase').addEventListener('click', () => {
+        carrito = [];
+        actualizarCarrito();
+        totalPriceElement.innerHTML = '';
+        paymentPlanElement.innerHTML = '';
         mostrarProductos();
-        const seleccion = prompt("Ingrese el código del producto que desea agregar al carrito:");
-        agregarAlCarrito(parseInt(seleccion));
-        mostrarCarrito();
-
-        seguirComprando = confirm("¿Desea agregar más productos al carrito?");
-    }
-
-    if (carrito.length === 0) {
-        console.error("El carrito está vacío. No se puede proceder con la compra.");
-        return;
-    }
-
-    const cuotas = parseInt(prompt("Ingrese la cantidad de cuotas (1, 3 o 6):"));
-    const precioTotal = calcularPrecioTotal(cuotas);
-
-    console.log(`\nEl monto total de los productos seleccionados es: $${precioTotal.toFixed(2)}`);
-    
-    if (cuotas === 6) {
-        console.warn("¡Atención! Al elegir 6 cuotas se aplica un interés.");
-    }
-
-    if (cuotas > 1) {
-        console.log("\nDesglose de pagos en cuotas:");
-        const montoPorCuota = precioTotal / cuotas;
-        for (let i = 1; i <= cuotas; i++) {
-            console.log(`Cuota ${i}: $${montoPorCuota.toFixed(2)}`);
-        }
-    }
+        interestWarning.classList.add('hidden'); // Oculta el mensaje de advertencia
+    });
 }
 
-simularCompra();
+// Evento para manejar la compra
+purchaseButton.addEventListener('click', () => {
+    const cuotas = parseInt(cuotasSelect.value);
+    const total = calcularPrecioTotalSinCuotas();
+    const totalPrice = cuotas === 6 ? total * interesFijoSeisCuotas : total;
+    totalPriceElement.innerHTML = `Total: $${totalPrice.toFixed(2)}`;
+    finalizarCompra(totalPrice, cuotas);
+});
+
+// Evento para vaciar el carrito
+clearCartButton.addEventListener('click', () => {
+    carrito = [];
+    actualizarCarrito();
+    totalPriceElement.innerHTML = '';
+    paymentPlanElement.innerHTML = '';
+    interestWarning.classList.add('hidden'); // Oculta el mensaje de advertencia
+});
+
+// Evento para mostrar advertencia de interés al seleccionar 6 cuotas
+cuotasSelect.addEventListener('change', () => {
+    if (parseInt(cuotasSelect.value) === 6) {
+        interestWarning.innerHTML = 'Seleccionaste 6 cuotas. Esta opción tiene intereses.';
+        interestWarning.classList.remove('hidden');
+    } else {
+        interestWarning.classList.add('hidden');
+    }
+});
+
+// Inicialización
+mostrarProductos();
+actualizarCarrito();
