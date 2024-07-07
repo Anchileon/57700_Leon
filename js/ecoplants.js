@@ -4,7 +4,8 @@ const productos = [
     { codigo: 3, nombre: "Aloe Vera", precio: 1250 },
     { codigo: 4, nombre: "Sedum", precio: 1400 },
     { codigo: 5, nombre: "Haworthia", precio: 2000 },
-    { codigo: 6, nombre: "Kalanchoe", precio: 2200 }
+    { codigo: 6, nombre: "Kalanchoe", precio: 2200 },
+    { codigo: 7, nombre: "Cacto", precio: 2500 },
 ];
 
 const interesFijoSeisCuotas = 1.45;
@@ -35,9 +36,17 @@ const mostrarProductos = () => {
             <img src="./assets/img/${producto.nombre.toLowerCase().replace(' ', '')}.jpg" alt="${producto.nombre}">
             <h3>${producto.nombre}</h3>
             <p>Precio: $${producto.precio}</p>
-            <button onclick="agregarAlCarrito(${producto.codigo})">Agregar al carrito</button>
+            <button class="btn-agregar-carrito" data-codigo="${producto.codigo}">Agregar al carrito</button>
         `;
         productList.appendChild(productCard);
+    });
+
+    // Adjuntar evento a los botones de agregar al carrito
+    document.querySelectorAll('.btn-agregar-carrito').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const codigo = parseInt(event.target.getAttribute('data-codigo'));
+            agregarAlCarrito(codigo);
+        });
     });
 }
 
@@ -62,9 +71,17 @@ const mostrarCarrito = () => {
         cartItem.className = 'cart-item';
         cartItem.innerHTML = `
             <p>${producto.nombre} - Precio: $${producto.precio}</p>
-            <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+            <button class="btn-eliminar-carrito" data-index="${index}">Eliminar</button>
         `;
         cartList.appendChild(cartItem);
+    });
+
+    // Adjuntar evento a los botones de eliminar del carrito
+    document.querySelectorAll('.btn-eliminar-carrito').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const index = parseInt(event.target.getAttribute('data-index'));
+            eliminarDelCarrito(index);
+        });
     });
 }
 
@@ -89,7 +106,7 @@ const actualizarTotalCarrito = () => {
 const actualizarCarrito = () => {
     localStorage.setItem('carrito', JSON.stringify(carrito));
     mostrarCarrito();
-    actualizarTotalCarrito(); // Actualiza el total cuando se modifica el carrito
+    actualizarTotalCarrito();
 }
 
 // Función para finalizar la compra
@@ -109,7 +126,7 @@ const finalizarCompra = (total, cuotas) => {
         totalPriceElement.innerHTML = '';
         paymentPlanElement.innerHTML = '';
         mostrarProductos();
-        interestWarning.classList.add('hidden'); // Oculta el mensaje de advertencia
+        interestWarning.classList.add('hidden');
     });
 }
 
@@ -128,7 +145,7 @@ clearCartButton.addEventListener('click', () => {
     actualizarCarrito();
     totalPriceElement.innerHTML = '';
     paymentPlanElement.innerHTML = '';
-    interestWarning.classList.add('hidden'); // Oculta el mensaje de advertencia
+    interestWarning.classList.add('hidden');
 });
 
 // Evento para mostrar advertencia de interés al seleccionar 6 cuotas
