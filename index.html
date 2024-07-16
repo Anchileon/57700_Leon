@@ -3,42 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-commerce de Plantas</title>
-    <link rel="stylesheet" href="estilos.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert -->
+    <title>E-commerce de Suculentas</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+    <script defer src="/js/ecoplants.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <!-- Contenido de la página -->
-    <div class="containerHeader">
-        <img src="./assets/img/logo.png" alt="Logo" class="logo">
-        <nav>
-            <ul>
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Productos</a></li>
-                <li><a href="#">Carrito</a></li>
-            </ul>
-        </nav>
-    </div>
-    <div class="hero">
-        <h2>Bienvenido a Ecoplants</h2>
-    </div>
-    <div class="container">
-        <div id="lista-producto" class="plantas-destacadas"></div>
-        <div id="lista-carrito"></div>
-        <div id="precio-total"></div>
-        <div id="plan-pagos"></div>
-        <button id="limpiar-carrito" class="btn">Vaciar Carrito</button>
-        <button id="comprar" class="btn">Comprar</button>
-        <div id="interes-warn" class="hidden"></div>
-        <select id="cuotas">
-            <option value="1">1 cuota</option>
-            <option value="3">3 cuotas</option>
-            <option value="6">6 cuotas</option>
-        </select>
-    </div>
+    <header>
+        <div class="containerHeader">
+            <img class="logo" src="./assets/img/ecoplants-logo.png" alt="EcoPlants Logo">
+            <nav>
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#">Catálogo</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container1">
+            <h2>Dale Vida a tu Mundo</h2>
+        </div>
+    </section>
+
+    <section class="plantas-destacadas">
+        <div class="container">
+            <h2>Plantas Destacadas</h2>
+            <div id="lista-producto"></div>
+        </div>
+    </section>
+
+    <section class="cart">
+        <div class="container">
+            <h2>Carrito de Compras</h2>
+            <div id="lista-carrito"></div>
+            <div id="precio-total"></div>
+            <div id="plan-pagos"></div>
+            <div id="interes-warn" class="hidden"></div>
+            <button id="limpiar-carrito">Vaciar Carrito</button>
+            <button id="comprar">Comprar</button>
+            <select id="cuotas">
+                <option value="1">1 Cuota</option>
+                <option value="3">3 Cuotas</option>
+                <option value="6">6 Cuotas</option>
+            </select>
+        </div>
+    </section>
+
     <footer>
-        <p>&copy; 2024 Ecoplants. Todos los derechos reservados.</p>
+        <div class="container">
+            <p>&copy; 2024 EcoPlants. Todos los derechos reservados.</p>
+        </div>
     </footer>
-    <script src="ecoplants.js"></script>
 </body>
 </html>

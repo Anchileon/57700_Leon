@@ -1,14 +1,15 @@
-const productos = [
-    { codigo: 1, nombre: "Echeveria", precio: 1100 },
-    { codigo: 2, nombre: "Crassula", precio: 1200 },
-    { codigo: 3, nombre: "Aloe Vera", precio: 1250 },
-    { codigo: 4, nombre: "Sedum", precio: 1400 },
-    { codigo: 5, nombre: "Haworthia", precio: 2000 },
-    { codigo: 6, nombre: "Kalanchoe", precio: 2200 },
-    { codigo: 7, nombre: "Cacto", precio: 2500 },
-];
 
 const interesFijoSeisCuotas = 1.45;
+
+let productos = [];
+
+fetch('https://66873cf80bc7155dc017071a.mockapi.io/articles')
+.then(response => response.json())
+.then(data => {
+    productos = data;
+    mostrarProductos();
+})
+.catch(error => console.error('Error fetching products:', error));
 
 // Cargar carrito desde localStorage
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
@@ -36,17 +37,9 @@ const mostrarProductos = () => {
             <img src="./assets/img/${producto.nombre.toLowerCase().replace(' ', '')}.jpg" alt="${producto.nombre}">
             <h3>${producto.nombre}</h3>
             <p>Precio: $${producto.precio}</p>
-            <button class="btn-agregar-carrito" data-codigo="${producto.codigo}">Agregar al carrito</button>
+            <button onclick="agregarAlCarrito(${producto.codigo})">Agregar al carrito</button>
         `;
         productList.appendChild(productCard);
-    });
-
-    // Adjuntar evento a los botones de agregar al carrito
-    document.querySelectorAll('.btn-agregar-carrito').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const codigo = parseInt(event.target.getAttribute('data-codigo'));
-            agregarAlCarrito(codigo);
-        });
     });
 }
 
@@ -56,6 +49,14 @@ const agregarAlCarrito = codigo => {
     if (producto) {
         carrito.push(producto);
         actualizarCarrito();
+        // Notificar con SweetAlert
+        Swal.fire({
+            icon: 'success',
+            title: 'Producto agregado',
+            text: `${producto.nombre} ha sido agregado al carrito.`,
+            showConfirmButton: false,
+            timer: 1500
+        });
     }
 }
 
@@ -71,17 +72,9 @@ const mostrarCarrito = () => {
         cartItem.className = 'cart-item';
         cartItem.innerHTML = `
             <p>${producto.nombre} - Precio: $${producto.precio}</p>
-            <button class="btn-eliminar-carrito" data-index="${index}">Eliminar</button>
+            <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
         `;
         cartList.appendChild(cartItem);
-    });
-
-    // Adjuntar evento a los botones de eliminar del carrito
-    document.querySelectorAll('.btn-eliminar-carrito').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const index = parseInt(event.target.getAttribute('data-index'));
-            eliminarDelCarrito(index);
-        });
     });
 }
 
@@ -106,7 +99,7 @@ const actualizarTotalCarrito = () => {
 const actualizarCarrito = () => {
     localStorage.setItem('carrito', JSON.stringify(carrito));
     mostrarCarrito();
-    actualizarTotalCarrito();
+    actualizarTotalCarrito(); // Actualiza el total cuando se modifica el carrito
 }
 
 // Función para finalizar la compra
@@ -126,7 +119,7 @@ const finalizarCompra = (total, cuotas) => {
         totalPriceElement.innerHTML = '';
         paymentPlanElement.innerHTML = '';
         mostrarProductos();
-        interestWarning.classList.add('hidden');
+        interestWarning.classList.add('hidden'); // Oculta el mensaje de advertencia
     });
 }
 
@@ -149,14 +142,28 @@ clearCartButton.addEventListener('click', () => {
 });
 
 // Evento para mostrar advertencia de interés al seleccionar 6 cuotas
-cuotasSelect.addEventListener('change', () => {
-    if (parseInt(cuotasSelect.value) === 6) {
-        interestWarning.innerHTML = 'Seleccionaste 6 cuotas. Esta opción tiene intereses.';
-        interestWarning.classList.remove('hidden');
+purchaseButton.addEventListener('click', () => {
+    const cuotas = parseInt(cuotasSelect.value);
+    const total = calcularPrecioTotalSinCuotas();
+    if (cuotas === 6) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: `Al seleccionar 6 cuotas, se aplicará un interés fijo del ${interesFijoSeisCuotas}% al total de la compra.`,
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then(result => {
+            if (result.isConfirmed) {
+                finalizarCompra(total, cuotas);
+            }
+        });
     } else {
-        interestWarning.classList.add('hidden');
+        finalizarCompra(total, cuotas);
     }
 });
+
+
 
 // Inicialización
 mostrarProductos();
